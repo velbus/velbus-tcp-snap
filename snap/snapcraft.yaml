@@ -1,0 +1,30 @@
+name: velbus-tcp
+version: '0.0.6'
+summary: Python application that bridges a Velbus installation with TCP
+description: |
+  Python application that bridges a Velbus installation with TCP.
+
+grade: stable
+confinement: strict
+
+apps:
+  velbus-tcp:
+    command: python3 $SNAP/__main__.py --settings $SNAP_DATA/settings.json
+    daemon: simple
+    plugs: [network-bind, serial-port, raw-usb]
+
+parts:
+  src:
+    plugin: dump
+    source: https://github.com/velbus/python-velbustcp.git
+    source-branch: ssl
+    stage-packages: [openssl]
+
+  extra: 
+    plugin: dump
+    source: extra
+
+  python:
+    plugin: python
+    python-version: python3
+    python-packages: [pyserial]

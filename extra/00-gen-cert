@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# Check if we have a certificate
+if [ ! -f "$SNAP_COMMON/certificate.pem" ]; then
+
+    # Generate 2048 bit RSA private key (no passphrase)
+    openssl genrsa -out "$SNAP_COMMON/privkey.pem" 2048
+
+    # Generate certificate signing request (CSR)
+    openssl req -new -key "$SNAP_COMMON/privkey.pem" -out "$SNAP_COMMON/signreq.csr" -subj "/C=BE/ST=Oost-Vlaanderen/L=Gavere/O=Velleman/OU=Velbus/CN=www.velbus.eu/emailAddress=sslkey@velbus.eu"
+
+    # Sign the certificate signing request
+    openssl x509 -req -days 365 -in "$SNAP_COMMON/signreq.csr" -signkey "$SNAP_COMMON/privkey.pem" -out "$SNAP_COMMON/certificate.pem"
+
+    # Set config
+    snapctl set tcp.ssl=false
+    snapctl set tcp.cert="$SNAP_COMMON/certificate.pem"
+    snapctl set tcp.pk="$SNAP_COMMON/privkey.pem"
+    snapctl set tcp.auth=false
+    snapctl set tcp.authkey="$(cat /proc/sys/kernel/random/uuid)"
+fi

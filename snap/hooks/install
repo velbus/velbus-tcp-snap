@@ -1,0 +1,12 @@
+#!/bin/sh
+set -e
+
+snapctl set tcp.port=27015
+snapctl set tcp.relay=true
+snapctl set serial.autodiscover=true
+snapctl set serial.port=/dev/ttyAMA0
+snapctl set logging.type=info
+snapctl set logging.output=stream
+
+# Generate certificate
+sh $SNAP/00-gen-cert

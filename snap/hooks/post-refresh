@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+
+# Check if certificate needs to be generated
+sh $SNAP/00-gen-cert
