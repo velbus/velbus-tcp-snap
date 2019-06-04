@@ -4,9 +4,7 @@ Snap package for python-velbustcp
 
 ## Connect serial/USB interface
 
-```
-:warning: Not connecting the interface will cause the program to not function. :warning:
-```
+:warning: Not connecting the interface will cause the connection to the bus to fail :warning:
 
 To allow the snap to access your Velbus USB interface, connect it to the raw-usb plug using
 
@@ -20,8 +18,10 @@ Alternatively, if you are running on a gadget which exposes a serial-port slot, 
 
 By default, the application will connect to the first Velbus USB interface it can find and use. If you want to change this behaviour, you can manually set the port using
 
-`snap set velbus-tcp serial.autodiscover=false`  
-`snap set velbus-tcp serial.port=/dev/ttyACM0`
+```
+snap set velbus-tcp serial.autodiscover=false  
+snap set velbus-tcp serial.port=/dev/ttyACM0
+```
 
 ## Authorization
 
@@ -45,8 +45,10 @@ You can enable SSL to encrypt the connection between you and your Velbus install
 
 By default, a certificate is generated during installation. If you want to supply your own certificate, use
 
-`snap set velbus-tcp tcp.cert=PATH_TO_YOUR_CERTIFICATE`  
-`snap set velbus-tcp tcp.pk=PATH_TO_YOUR_PRIVATE_KEY`
+```
+snap set velbus-tcp tcp.cert=PATH_TO_YOUR_CERTIFICATE
+snap set velbus-tcp tcp.pk=PATH_TO_YOUR_PRIVATE_KEY
+```
 
 ## Configuration
 
