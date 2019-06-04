@@ -2,26 +2,55 @@
 
 Snap package for python-velbustcp
 
-## Connect interface and set port
+## Connect serial/USB interface
 
-To connect the usb interface, use either
+```
+:warning: Not connecting the interface will cause the program to not function. :warning:
+```
 
-snap connect velbus-tcp:raw-usb :raw-usb
+To allow the snap to access your Velbus USB interface, connect it to the raw-usb plug using
 
-or
+`snap connect velbus-tcp:raw-usb :raw-usb`
 
-snap connect velbus-tcp:serial-port :serial-port
+Alternatively, if you are running on a gadget which exposes a serial-port slot, use
 
+`snap connect velbus-tcp:serial-port :serial-port`
 
-Autodiscovery wil not work, to manually set the port use
+## Auto discovery
 
-snap set velbus-tcp serial.port=/dev/ttyACM0
+By default, the application will connect to the first Velbus USB interface it can find and use. If you want to change this behaviour, you can manually set the port using
 
- 
+`snap set velbus-tcp serial.autodiscover=false`  
+`snap set velbus-tcp serial.port=/dev/ttyACM0`
+
+## Authorization
+
+You can enable authorization to restrict outside access to your Velbus installation, enable it by using
+
+`snap set velbus-tcp tcp.auth=true`
+
+By default, an authorization key is generated during installation, to get this key use
+
+`snap get velbus-tcp tcp.authkey`
+
+To set the authorization key, use
+
+`snap set velbus-tcp tcp.authkey=YOUR_KEY_HERE`
+
+## SSL
+
+You can enable SSL to encrypt the connection between you and your Velbus installation, enable it by using
+
+`snap set velbus-tcp tcp.ssl=true`
+
+By default, a certificate is generated during installation. If you want to supply your own certificate, use
+
+`snap set velbus-tcp tcp.cert=PATH_TO_YOUR_CERTIFICATE`  
+`snap set velbus-tcp tcp.pk=PATH_TO_YOUR_PRIVATE_KEY`
 
 ## Configuration
 
-To change the configuration use
+All configuration options
 
 ```
 snap set velbus-tcp tcp.port

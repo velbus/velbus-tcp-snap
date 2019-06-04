@@ -17,7 +17,6 @@ parts:
   src:
     plugin: dump
     source: https://github.com/velbus/python-velbustcp.git
-    source-branch: ssl
     stage-packages: [openssl]
 
   extra: 
