@@ -1,6 +1,14 @@
 # velbus-tcp-snap
 
+[![Snap Status](https://build.snapcraft.io/badge/velbus/velbus-tcp-snap.svg)](https://build.snapcraft.io/user/velbus/velbus-tcp-snap)
+
 Snap package for python-velbustcp
+
+## Installation
+
+The snap is published through the official Canonical store. To install simply open a terminal on any snapd-supported Linux distribution and type
+
+`snap install velbus-tcp`
 
 ## Connect serial/USB interface
 
@@ -18,7 +26,7 @@ Alternatively, if you are running on a gadget which exposes a serial-port slot, 
 
 By default, the application will connect to the first Velbus USB interface it can find and use. If you want to change this behaviour, you can manually set the port using
 
-```
+```yaml
 snap set velbus-tcp serial.autodiscover=false  
 snap set velbus-tcp serial.port=/dev/ttyACM0
 ```
@@ -45,7 +53,7 @@ You can enable SSL to encrypt the connection between you and your Velbus install
 
 By default, a certificate is generated during installation. If you want to supply your own certificate, use
 
-```
+```yaml
 snap set velbus-tcp tcp.cert=PATH_TO_YOUR_CERTIFICATE
 snap set velbus-tcp tcp.pk=PATH_TO_YOUR_PRIVATE_KEY
 ```
@@ -54,7 +62,7 @@ snap set velbus-tcp tcp.pk=PATH_TO_YOUR_PRIVATE_KEY
 
 All configuration options
 
-```
+```yaml
 snap set velbus-tcp tcp.port
 snap set velbus-tcp tcp.relay
 snap set velbus-tcp tcp.ssl
