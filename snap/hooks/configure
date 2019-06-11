@@ -47,7 +47,7 @@ if tcp_ssl == "true" and tcp_pk == "":
 	exit(1)
 
 if tcp_ssl == "true" and tcp_pk != "" and not os.path.exists(tcp_pk):
-	print("Given tcp.pk - no such path '{0}'".format(tcp_pk))
+	print("Given tcp.pk does not exist at '{0}'".format(tcp_pk))
 	exit(1)
 
 if tcp_ssl == "true" and tcp_cert == "":
@@ -55,7 +55,7 @@ if tcp_ssl == "true" and tcp_cert == "":
 	exit(1)
 
 if tcp_ssl == "true" and tcp_cert != "" and not os.path.exists(tcp_cert):
-	print("Given tcp.cert - no such path '{0}'".format(tcp_cert))
+	print("Given tcp.cert does not exist at '{0}'".format(tcp_cert))
 	exit(1)	
 
 if tcp_auth != "true" and tcp_auth != "false":
