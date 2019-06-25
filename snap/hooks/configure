@@ -11,16 +11,7 @@ def parse_config(setting):
 	return setting.split(",")
 
 # TCP
-
-# Host: explicitly check for exception, that means that it is unset
-# Set it to 0.0.0.0
-try:
-	tcp_hosts = subprocess.check_output(["snapctl", "get", "tcp.host"], stderr=subprocess.DEVNULL).decode("utf-8").strip()
-except:
-	subprocess.check_output(["snapctl", "set", "tcp.host=0.0.0.0"]).decode("utf-8").strip()
-	tcp_hosts = ["0.0.0.0"]
-
-tcp_hosts = parse_config(tcp_hosts)
+tcp_hosts = parse_config(subprocess.check_output(["snapctl", "get", "tcp.host"]).decode("utf-8").strip())
 tcp_ports = parse_config(subprocess.check_output(["snapctl", "get", "tcp.port"]).decode("utf-8").strip())
 tcp_relays = parse_config(subprocess.check_output(["snapctl", "get", "tcp.relay"]).decode("utf-8").strip())
 # TCP SSL
@@ -67,8 +58,8 @@ for idx, host in enumerate(tcp_hosts):
 		cert = tcp_certs[idx]	
 
 	if host == "":
-		print("TCP host cannot be empty")
-		exit(1)
+		print("TCP host empty, setting '0.0.0.0'")
+		host = "0.0.0.0"
 
 	try:
 		temp_tcp_host = ipaddress.ip_address(host)
@@ -129,6 +120,7 @@ for idx, host in enumerate(tcp_hosts):
 		exit(1)	
 
 		connection = {}
+		connection["host"] = host
 		connection["port"] = port
 		connection["relay"] = relay
 		connection["ssl"] = ssl
@@ -168,6 +160,11 @@ config["logging"]["type"] = logging_type
 config_path = os.environ["SNAP_DATA"] + "/settings.json"
 with open(config_path, "w") as f:
 	json.dump(config, f)
+
+# Fix empty hosts
+hosts = [conn["host"] for conn in config["connections"]]
+hosts_str = hosts.join(",")
+subprocess.check_output(["snapctl", "set", "tcp.hosts={0}".format(hosts_str)])
 
 # Reload service
 subprocess.check_output(["snapctl", "restart", "velbus-tcp"])
