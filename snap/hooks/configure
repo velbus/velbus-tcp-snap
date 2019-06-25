@@ -156,7 +156,7 @@ config["logging"] = dict()
 config["logging"]["output"] = logging_output
 config["logging"]["type"] = logging_type
 
-Write config
+# Write config
 config_path = os.environ["SNAP_DATA"] + "/settings.json"
 with open(config_path, "w") as f:
 	json.dump(config, f)
