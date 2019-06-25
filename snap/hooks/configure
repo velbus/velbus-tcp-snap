@@ -3,19 +3,24 @@
 import subprocess
 import json
 import os
+import ipaddress
 
 ## Get configuration settings
 
+def parse_config(setting):
+	return setting.split(",")
+
 # TCP
-tcp_port = subprocess.check_output(["snapctl", "get", "tcp.port"]).decode("utf-8").strip()
-tcp_relay = subprocess.check_output(["snapctl", "get", "tcp.relay"]).decode("utf-8").strip()
+tcp_hosts = parse_config(subprocess.check_output(["snapctl", "get", "tcp.host"]).decode("utf-8").strip())
+tcp_ports = parse_config(subprocess.check_output(["snapctl", "get", "tcp.port"]).decode("utf-8").strip())
+tcp_relays = parse_config(subprocess.check_output(["snapctl", "get", "tcp.relay"]).decode("utf-8").strip())
 # TCP SSL
-tcp_ssl = subprocess.check_output(["snapctl", "get", "tcp.ssl"]).decode("utf-8").strip()
-tcp_pk = subprocess.check_output(["snapctl", "get", "tcp.pk"]).decode("utf-8").strip()
-tcp_cert = subprocess.check_output(["snapctl", "get", "tcp.cert"]).decode("utf-8").strip()
+tcp_ssls = parse_config(subprocess.check_output(["snapctl", "get", "tcp.ssl"]).decode("utf-8").strip())
+tcp_pks = parse_config(subprocess.check_output(["snapctl", "get", "tcp.pk"]).decode("utf-8").strip())
+tcp_certs = parse_config(subprocess.check_output(["snapctl", "get", "tcp.cert"]).decode("utf-8").strip())
 # TCP Auth
-tcp_auth = subprocess.check_output(["snapctl", "get", "tcp.auth"]).decode("utf-8").strip()
-tcp_auth_key = subprocess.check_output(["snapctl", "get", "tcp.authkey"]).decode("utf-8").strip()
+tcp_auths = parse_config(subprocess.check_output(["snapctl", "get", "tcp.auth"]).decode("utf-8").strip())
+tcp_auth_keys = parse_config(subprocess.check_output(["snapctl", "get", "tcp.authkey"]).decode("utf-8").strip())
 # Serial
 serial_autodiscover = subprocess.check_output(["snapctl", "get", "serial.autodiscover"]).decode("utf-8").strip()
 serial_port = subprocess.check_output(["snapctl", "get", "serial.port"]).decode("utf-8").strip()
@@ -23,49 +28,108 @@ serial_port = subprocess.check_output(["snapctl", "get", "serial.port"]).decode(
 logging_type = subprocess.check_output(["snapctl", "get", "logging.type"]).decode("utf-8").strip()
 logging_output = subprocess.check_output(["snapctl", "get", "logging.output"]).decode("utf-8").strip()
 
-# Validate
-try:
-	tcp_port = int(tcp_port)
-except:
-	print("Given TCP port '{0}' is not an integer".format([tcp_port]))
+###
+## Validate and set config
+###
+
+config = dict()
+
+# Make sure the TCP values have even length of items
+if any(len(lst) != len(tcp_hosts) for lst in [tcp_ports, tcp_relays, tcp_ssls, tcp_auths, tcp_auth_keys]):
+	print("Non-equal number of elements in tcp lists")
 	exit(1)
 
-if tcp_port < 1 or tcp_port > 65565:
-	print("Given TCP port '{0}' should be between 1 and 65565".format([tcp_port]))
-	exit(1)
+# TCP
+config["connections"] = []
+for idx, host in enumerate(tcp_hosts):
 
-if tcp_relay != "true" and tcp_relay != "false":
-	print("Given value for tcp.relay '{0}' is not valid, should be bool".format(tcp_relay))
-	exit(1)
+	port = tcp_ports[idx]
+	relay = tcp_relays[idx]
+	ssl = tcp_ssls[idx]
+	auth = tcp_auths[idx]
+	auth_key = tcp_auth_keys[idx]
+	pk = ""
+	cert = ""
 
-if tcp_ssl != "true" and tcp_ssl != "false":
-	print("Given value for tcp.ssl '{0}' is not valid, should be bool".format(tcp_ssl))
-	exit(1)	
+	if len(tcp_pks) != idx:
+		pk = tcp_pks[idx]
 
-if tcp_ssl == "true" and tcp_pk == "":
-	print("Given tcp.pk empty while tcp.ssl is set to 'true'")
-	exit(1)
+	if len(tcp_certs) != idx:
+		cert = tcp_certs[idx]	
 
-if tcp_ssl == "true" and tcp_pk != "" and not os.path.exists(tcp_pk):
-	print("Given tcp.pk does not exist at '{0}'".format(tcp_pk))
-	exit(1)
+	if host == "":
+		print("TCP host empty")
+		exit(1)
 
-if tcp_ssl == "true" and tcp_cert == "":
-	print("Given tcp.cert empty while tcp.ssl is set to 'true'")
-	exit(1)
+	try:
+		temp_tcp_host = ipaddress.ip_address(host)
+	except:
+		print("Given TCP host '{0}' is not a IPv4 or IPv6 address".format([host]))
+		exit(1)
 
-if tcp_ssl == "true" and tcp_cert != "" and not os.path.exists(tcp_cert):
-	print("Given tcp.cert does not exist at '{0}'".format(tcp_cert))
-	exit(1)	
+	try:
+		temp_tcp_port = int(port)
+	except:
+		print("Given TCP port '{0}' is not an integer".format([port]))
+		exit(1)
 
-if tcp_auth != "true" and tcp_auth != "false":
-	print("Given value for tcp.auth '{0}' is not valid, should be bool".format(tcp_auth))
-	exit(1)	
-	
-if tcp_auth == "true" and tcp_auth_key == "":
-	print("Given tcp.auth_key is empty while tcp.auth is set to 'true'")
-	exit(1)		
+	if temp_tcp_port < 1 or temp_tcp_port > 65565:
+		print("Given TCP port '{0}' should be between 1 and 65565".format([port]))
+		exit(1)
 
+	if relay != "true" and relay != "false":
+		print("Given value for tcp.relay '{0}' is not valid, should be bool".format(relay))
+		exit(1)
+
+	if ssl != "true" and ssl != "false":
+		print("Given value for tcp.ssl '{0}' is not valid, should be bool".format(ssl))
+		exit(1)	
+
+	if ssl == "true" and pk == "":
+
+		# Check if local private key exists
+		if os.path.exists(os.environ["SNAP_COMMON"] + "/privkey.pem"):
+			pk = os.environ["SNAP_COMMON"] + "/privkey.pem"
+		else:
+			print("No private key in tcp.pk idx {0} while no local private key exists and tcp.ssl is set to 'true'".format(idx))
+			exit(1)
+
+	if ssl == "true" and pk != "" and not os.path.exists(pk):
+		print("Given tcp.pk does not exist at '{0}'".format(pk))
+		exit(1)
+
+	if ssl == "true" and cert == "":
+		
+		# Check if local certificate exists
+		if os.path.exists(os.environ["SNAP_COMMON"] + "/certificate.pem"):
+			cert = os.environ["SNAP_COMMON"] + "/certificate.pem"
+		else:
+			print("No certificate in tcp.cert idx {0} while no local certificate exists and tcp.ssl is set to 'true'".format(idx))
+			exit(1)
+
+	if ssl == "true" and cert != "" and not os.path.exists(cert):
+		print("Given tcp.cert does not exist at '{0}'".format(cert))
+		exit(1)	
+
+	if auth != "true" and auth != "false":
+		print("Given value for tcp.auth '{0}' is not valid, should be bool".format(auth))
+		exit(1)	
+		
+	if auth == "true" and auth_key == "":
+		print("Given tcp.auth_key is empty while tcp.auth is set to 'true'")
+		exit(1)	
+
+		connection = {}
+		connection["port"] = port
+		connection["relay"] = relay
+		connection["ssl"] = ssl
+		connection["pk"] = pk
+		connection["cert"] = cert
+		connection["auth"] = auth
+		connection["auth_key"] = auth_key
+		config["connections"].append(connection)	
+
+# Serial
 if serial_autodiscover != "true" and serial_autodiscover != "false":
 	print("Given value for serial.autodiscover '{0}' is not valid, should be bool".format(serial_autodiscover))
 	exit(1)
@@ -74,6 +138,11 @@ if serial_autodiscover == False and serial_port == "":
 	print("serial.autodiscover is 'false' while no serial.port is specified")
 	exit(1)
 
+config["serial"] = dict()
+config["serial"]["autodiscover"] = True if serial_autodiscover == "true" else False
+config["serial"]["port"] = serial_port	
+
+# Logging
 if logging_type not in ["info", "debug"]:
 	print("logging.type should be 'info' or 'debug', got '{0}'".format(logging_type))
 	exit(1)
@@ -82,23 +151,11 @@ if logging_output not in ["stream", "syslog"]:
 	print("logging.type should be 'syslog' or 'stream', got '{0}'".format(logging_output))
 	exit(1)	
 
-# Write config
-config = dict()
-config["tcp"] = dict()
-config["tcp"]["port"] = tcp_port
-config["tcp"]["relay"] = True if tcp_relay == "true" else False
-config["tcp"]["ssl"] = True if tcp_ssl == "true" else False
-config["tcp"]["pk"] = tcp_pk
-config["tcp"]["cert"] = tcp_cert
-config["tcp"]["auth"] = True if tcp_auth == "true" else False
-config["tcp"]["auth_key"] = tcp_auth_key
-config["serial"] = dict()
-config["serial"]["autodiscover"] = True if serial_autodiscover == "true" else False
-config["serial"]["port"] = serial_port
 config["logging"] = dict()
 config["logging"]["output"] = logging_output
 config["logging"]["type"] = logging_type
 
+# Write config
 config_path = os.environ["SNAP_DATA"] + "/settings.json"
 with open(config_path, "w") as f:
 	json.dump(config, f)

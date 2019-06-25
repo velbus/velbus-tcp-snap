@@ -24,32 +24,36 @@ Alternatively, if you are running on a gadget which exposes a serial-port slot, 
 
 ## Auto discovery
 
-By default, the application will connect to the first Velbus USB interface it can find and use. If you want to change this behaviour, you can manually set the port using
+By default, the application will connect to the first Velbus USB interface it can find and use. If you want to change this behaviour or use a serial port, you can manually set the port using
 
 ```yaml
 snap set velbus-tcp serial.autodiscover=false  
-snap set velbus-tcp serial.port=/dev/ttyACM0
+snap set velbus-tcp serial.port=/dev/ttyAMA0
 ```
+
+## TCP binding
+
+By default, the application will bind on 27015 and accept all hosts, using SSL and authorization.
 
 ## Authorization
 
-You can enable authorization to restrict outside access to your Velbus installation, enable it by using
+You can enable/disable authorization to restrict unauthorized access to your Velbus installation by using
 
-`snap set velbus-tcp tcp.auth=true`
+`snap set velbus-tcp tcp.auth=true|false`
 
 By default, an authorization key is generated during installation, to get this key use
 
 `snap get velbus-tcp tcp.authkey`
 
-To set the authorization key, use
+To set your own authorization key, use
 
 `snap set velbus-tcp tcp.authkey=YOUR_KEY_HERE`
 
 ## SSL
 
-You can enable SSL to encrypt the connection between you and your Velbus installation, enable it by using
+You can enable SSL to encrypt the connection between you and the application, enable/disable it by using
 
-`snap set velbus-tcp tcp.ssl=true`
+`snap set velbus-tcp tcp.ssl=true|false`
 
 By default, a certificate is generated during installation. If you want to supply your own certificate, use
 
@@ -57,6 +61,27 @@ By default, a certificate is generated during installation. If you want to suppl
 snap set velbus-tcp tcp.cert=PATH_TO_YOUR_CERTIFICATE
 snap set velbus-tcp tcp.pk=PATH_TO_YOUR_PRIVATE_KEY
 ```
+
+If you want to revert to the generated certificate/private key, you may set tcp.cert and tcp.pk empty.
+
+## Multiple bind points
+
+You can set up multiple bind points by using comma-seperated values. You'll need to supply all values for a second bind point, for example;
+
+```yaml
+snap set velbus-tcp \
+tcp.host=0.0.0.0,127.0.0.1 \
+tcp.port=27015,54934 \
+tcp.relay=true,true \
+tcp.ssl=true,true \
+tcp.auth=true,false \
+tcp.authkey=MY_AUTH_KEY,
+```
+
+Which would set up two bind points;
+
+One which binds on 27015 and accepts all hosts (0.0.0.0), which has TCP relay and SSL and uses auth with MY_AUTH_KEY
+One which binds on 54934 and only accepts 127.0.0.1, which has relay and SSL and doesn't have auth
 
 ## Configuration
 
