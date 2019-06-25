@@ -1,11 +1,5 @@
 #!/bin/sh
 set -e
 
-# Set host (new in 1.1.0)
-host=$(snapctl get tcp.host)
-if [ $? != 0 ]; then
-    snapctl set tcp.host=0.0.0.0
-fi
-
 # Check if certificate needs to be generated
 sh $SNAP/00-gen-cert
