@@ -163,7 +163,7 @@ with open(config_path, "w") as f:
 
 # Fix empty hosts
 hosts = [conn["host"] for conn in config["connections"]]
-hosts_str = hosts.join(",")
+hosts_str = ",".join(host)
 subprocess.check_output(["snapctl", "set", "tcp.hosts={0}".format(hosts_str)])
 
 # Reload service
