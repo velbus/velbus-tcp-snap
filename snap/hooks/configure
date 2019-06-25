@@ -11,7 +11,16 @@ def parse_config(setting):
 	return setting.split(",")
 
 # TCP
-tcp_hosts = parse_config(subprocess.check_output(["snapctl", "get", "tcp.host"]).decode("utf-8").strip())
+
+# Host: explicitly check for exception, that means that it is unset
+# Set it to 0.0.0.0
+try:
+	tcp_hosts = subprocess.check_output(["snapctl", "get", "tcp.host"], stderr=subprocess.DEVNULL).decode("utf-8").strip()
+except:
+	subprocess.check_output(["snapctl", "set", "tcp.host=0.0.0.0"]).decode("utf-8").strip()
+	tcp_hosts = ["0.0.0.0"]
+
+tcp_hosts = parse_config(tcp_hosts)
 tcp_ports = parse_config(subprocess.check_output(["snapctl", "get", "tcp.port"]).decode("utf-8").strip())
 tcp_relays = parse_config(subprocess.check_output(["snapctl", "get", "tcp.relay"]).decode("utf-8").strip())
 # TCP SSL
@@ -58,8 +67,8 @@ for idx, host in enumerate(tcp_hosts):
 		cert = tcp_certs[idx]	
 
 	if host == "":
-		print("TCP host empty, setting '0.0.0.0'")
-		host = "0.0.0.0"		
+		print("TCP host cannot be empty")
+		exit(1)
 
 	try:
 		temp_tcp_host = ipaddress.ip_address(host)
