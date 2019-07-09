@@ -8,8 +8,6 @@ snapctl set serial.autodiscover=true
 snapctl set serial.port=/dev/ttyAMA0 
 snapctl set logging.type=info 
 snapctl set logging.output=stream
-snapctl set tcp.ssl=false 
-snapctl set tcp.auth=false
 
 # Generate certificate
 sh $SNAP/00-gen-cert

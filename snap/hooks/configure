@@ -122,11 +122,11 @@ for idx, host in enumerate(tcp_hosts):
 	connection = {}
 	connection["host"] = host
 	connection["port"] = port
-	connection["relay"] = relay
-	connection["ssl"] = ssl
+	connection["relay"] = True if relay == "true" else False
+	connection["ssl"] = True if ssl == "true" else False
 	connection["pk"] = pk
 	connection["cert"] = cert
-	connection["auth"] = auth
+	connection["auth"] = True if auth == "true" else False
 	connection["auth_key"] = auth_key
 	config["connections"].append(connection)	
 

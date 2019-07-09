@@ -13,7 +13,7 @@ if [ ! -f "$SNAP_COMMON/certificate.pem" ]; then
     openssl x509 -req -days 365 -in "$SNAP_COMMON/signreq.csr" -signkey "$SNAP_COMMON/privkey.pem" -out "$SNAP_COMMON/certificate.pem"
 
     # Set config
-    snapctl set tcp.ssl=false
+    snapctl set tcp.ssl=true
     snapctl set tcp.cert="$SNAP_COMMON/certificate.pem"
     snapctl set tcp.pk="$SNAP_COMMON/privkey.pem"
     snapctl set tcp.auth=false
