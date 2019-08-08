@@ -49,6 +49,8 @@ To set your own authorization key, use
 
 `snap set velbus-tcp tcp.authkey=YOUR_KEY_HERE`
 
+The authorization key is a key that needs to be sent after establishing a connection. No data will be exchanged until the key verified.
+
 ## SSL
 
 You can enable SSL to encrypt the connection between you and the application, enable/disable it by using
