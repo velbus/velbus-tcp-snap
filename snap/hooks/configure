@@ -10,6 +10,8 @@ import ipaddress
 def parse_config(setting):
 	return setting.split(",")
 
+# Velbus
+ntp = subprocess.check_output(["snapctl", "get", "velbus.ntp"]).decode("utf-8").strip()
 # TCP
 tcp_hosts = parse_config(subprocess.check_output(["snapctl", "get", "tcp.host"]).decode("utf-8").strip())
 tcp_ports = parse_config(subprocess.check_output(["snapctl", "get", "tcp.port"]).decode("utf-8").strip())
@@ -34,12 +36,26 @@ logging_output = subprocess.check_output(["snapctl", "get", "logging.output"]).d
 
 config = dict()
 
+# Velbus
+
+config["velbus"] = {}
+
+if ntp == "":
+	ntp = "false"
+
+if ntp != "true" and ntp != "false":
+	print("Given value for velbus.ntp '{0}' is not valid, should be bool".format(ntp))
+	exit(1)
+
+config["velbus"]["ntp"] = True if ntp == "true" else False
+
+# TCP
+
 # Make sure the TCP values have even length of items
 if any(len(lst) != len(tcp_hosts) for lst in [tcp_ports, tcp_relays, tcp_ssls, tcp_auths, tcp_auth_keys]):
 	print("Non-equal number of elements in tcp lists")
 	exit(1)
 
-# TCP
 config["connections"] = []
 for idx, host in enumerate(tcp_hosts):
 
@@ -109,7 +125,7 @@ for idx, host in enumerate(tcp_hosts):
 
 	if ssl == "true" and cert != "" and not os.path.exists(cert):
 		print("Given tcp.cert does not exist at '{0}'".format(cert))
-		exit(1)	
+		exit(1)
 
 	if auth != "true" and auth != "false":
 		print("Given value for tcp.auth '{0}' is not valid, should be bool".format(auth))

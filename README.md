@@ -31,6 +31,14 @@ snap set velbus-tcp serial.autodiscover=false
 snap set velbus-tcp serial.port=/dev/ttyAMA0
 ```
 
+## NTP
+
+The application can broadcast the system time on the bus, it will do so at startup and after every hour transition.
+
+This is option disabled by default. To enable, use
+
+`snap set velbus-tcp velbus.ntp=true|false`
+
 ## TCP binding
 
 By default, the application will bind on 27015 and accept all hosts, using SSL and authorization.
@@ -90,6 +98,7 @@ One which binds on 54934 and only accepts 127.0.0.1, which has relay and SSL and
 All configuration options
 
 ```yaml
+snap set velbus-tcp velbus.ntp
 snap set velbus-tcp tcp.port
 snap set velbus-tcp tcp.relay
 snap set velbus-tcp tcp.ssl
