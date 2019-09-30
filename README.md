@@ -35,7 +35,7 @@ snap set velbus-tcp serial.port=/dev/ttyAMA0
 
 The application can broadcast the system time on the bus, it will do so at startup and after every hour transition.
 
-This is option disabled by default. To enable, use
+This is option disabled by default. You can enable/disable NTP by using
 
 `snap set velbus-tcp velbus.ntp=true|false`
 
@@ -64,15 +64,6 @@ The authorization key is a key that needs to be sent after establishing a connec
 You can enable SSL to encrypt the connection between you and the application, enable/disable it by using
 
 `snap set velbus-tcp tcp.ssl=true|false`
-
-By default, a certificate is generated during installation. If you want to supply your own certificate, use
-
-```yaml
-snap set velbus-tcp tcp.cert=PATH_TO_YOUR_CERTIFICATE
-snap set velbus-tcp tcp.pk=PATH_TO_YOUR_PRIVATE_KEY
-```
-
-If you want to revert to the generated certificate/private key, you may set tcp.cert and tcp.pk empty.
 
 ## Multiple bind points
 
