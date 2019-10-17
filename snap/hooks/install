@@ -1,7 +1,8 @@
 #!/bin/sh
 set -e
 
-snapctl set velbus.ntp=false
+snapctl set ntp.enabled=false
+snapctl set ntp.synctime=
 snapctl set tcp.host=0.0.0.0 
 snapctl set tcp.port=27015 
 snapctl set tcp.relay=true 

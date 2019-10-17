@@ -1,5 +1,5 @@
 name: velbus-tcp
-version: 1.2.5
+version: 1.2.6
 base: core18
 summary: Python application that bridges a Velbus installation with TCP
 description: |
@@ -18,7 +18,7 @@ parts:
   src:
     plugin: dump
     source: https://github.com/velbus/python-velbustcp.git
-    source-tag: 1.2.5
+    source-tag: 1.2.6
     stage-packages: [openssl]
 
   extra: 
@@ -28,4 +28,4 @@ parts:
   python:
     plugin: python
     python-version: python3
-    python-packages: [pyserial]
+    python-packages: [pyserial, pytz, tzlocal]

@@ -33,11 +33,21 @@ snap set velbus-tcp serial.port=/dev/ttyAMA0
 
 ## NTP
 
-The application can broadcast the system time on the bus, it will do so at startup and after every hour transition.
+The application can broadcast the system time on the bus, this is option disabled by default.
 
-This is option disabled by default. You can enable/disable NTP by using
+You can enable/disable NTP by using
 
-`snap set velbus-tcp velbus.ntp=true|false`
+`snap set velbus-tcp ntp.enabled=true|false`
+
+When enabled, it will broadcast the time at startup, after that;
+
+If ntp.synctime is not set or is set to empty, it will do so at every hour transition and at DST transitions, whichever is closer.
+
+If ntp.synctime is set, it will broadcast at the specified time and at DST transitions, whichever is closer.
+
+To change the the sync time use
+
+`snap set velbus-tcp ntp.synctime='03:00'|''`
 
 ## TCP binding
 

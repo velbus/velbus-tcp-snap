@@ -10,8 +10,9 @@ import ipaddress
 def parse_config(setting):
 	return setting.split(",")
 
-# Velbus
-ntp = subprocess.check_output(["snapctl", "get", "velbus.ntp"]).decode("utf-8").strip()
+# NTP
+ntp_enabled = subprocess.check_output(["snapctl", "get", "ntp.enabled"]).decode("utf-8").strip()
+ntp_synctime = subprocess.check_output(["snapctl", "get", "ntp.synctime"]).decode("utf-8").strip()
 # TCP
 tcp_hosts = parse_config(subprocess.check_output(["snapctl", "get", "tcp.host"]).decode("utf-8").strip())
 tcp_ports = parse_config(subprocess.check_output(["snapctl", "get", "tcp.port"]).decode("utf-8").strip())
@@ -36,18 +37,46 @@ logging_output = subprocess.check_output(["snapctl", "get", "logging.output"]).d
 
 config = dict()
 
-# Velbus
+# NTP
 
-config["velbus"] = {}
+config["ntp"] = {}
 
-if ntp == "":
-	ntp = "false"
-
-if ntp != "true" and ntp != "false":
-	print("Given value for velbus.ntp '{0}' is not valid, should be bool".format(ntp))
+if not ntp_enabled in ["true", "false"]:
+	print("Given value for ntp.enabled '{0}' is not valid, should be bool".format(ntp_enabled))
 	exit(1)
 
-config["velbus"]["ntp"] = True if ntp == "true" else False
+config["ntp"]["enabled"] = True if ntp_enabled == "true" else False
+
+ # Validate sync time 
+if ntp_synctime != "":
+	
+	splitted = ntp_synctime.split(":")
+
+	if len(splitted) != 2:
+		print("The provided sync time has an invalid format '{0}', should be 'hh:mm' or empty".format(ntp_synctime))
+		exit(1)
+
+	try:
+		hh = int(splitted[0])
+	except:
+		print("The provided sync time hour is invalid '{0}'".format(splitted[0]))
+		exit(1)
+
+	if not 0 <= hh <= 23:
+		print("The provided sync time hour is invalid '{0}'".format(hh))
+		exit(1)
+
+	try:
+		mm = int(splitted[1])
+	except:
+		print("The provided sync time minute is invalid '{0}'".format(splitted[1]))
+		exit(1)		
+	
+	if not 0 <= mm <= 59:
+		print("The provided sync time minute is invalid '{0}'".format(mm))
+		exit(1)
+
+config["ntp"]["synctime"] = ntp_synctime
 
 # TCP
 
@@ -89,15 +118,15 @@ for idx, host in enumerate(tcp_hosts):
 		print("Given TCP port '{0}' is not an integer".format([port]))
 		exit(1)
 
-	if temp_tcp_port < 1 or temp_tcp_port > 65565:
+	if not 1 <= temp_tcp_port <= 65565:
 		print("Given TCP port '{0}' should be between 1 and 65565".format([port]))
 		exit(1)
 
-	if relay != "true" and relay != "false":
+	if not relay in ["true", "false"]:
 		print("Given value for tcp.relay '{0}' is not valid, should be bool".format(relay))
 		exit(1)
 
-	if ssl != "true" and ssl != "false":
+	if not ssl in ["true", "false"]:
 		print("Given value for tcp.ssl '{0}' is not valid, should be bool".format(ssl))
 		exit(1)	
 
@@ -127,7 +156,7 @@ for idx, host in enumerate(tcp_hosts):
 		print("Given tcp.cert does not exist at '{0}'".format(cert))
 		exit(1)
 
-	if auth != "true" and auth != "false":
+	if not auth in ["true", "false"]:
 		print("Given value for tcp.auth '{0}' is not valid, should be bool".format(auth))
 		exit(1)	
 		
@@ -147,7 +176,7 @@ for idx, host in enumerate(tcp_hosts):
 	config["connections"].append(connection)	
 
 # Serial
-if serial_autodiscover != "true" and serial_autodiscover != "false":
+if not serial_autodiscover in ["true", "false"]:
 	print("Given value for serial.autodiscover '{0}' is not valid, should be bool".format(serial_autodiscover))
 	exit(1)
 

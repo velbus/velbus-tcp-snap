@@ -3,3 +3,13 @@ set -e
 
 # Check if certificate needs to be generated
 sh $SNAP/00-gen-cert
+
+# Change velbus.ntp config to ntp.enabled
+ntp=$(snapctl get velbus.ntp)
+if [ ! -z $ntp ]; then
+    snapctl set ntp.enabled=$ntp
+    snapctl set ntp.synctime=
+
+    # Reset to empty as there is no way to unset it yet
+    snapctl set velbus.ntp= 
+fi
