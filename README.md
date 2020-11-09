@@ -1,6 +1,6 @@
 # velbus-tcp-snap
 
-[![Snap Status](https://build.snapcraft.io/badge/velbus/velbus-tcp-snap.svg)](https://build.snapcraft.io/user/velbus/velbus-tcp-snap)
+[![velbus-tcp](https://snapcraft.io/velbus-tcp/badge.svg)](https://snapcraft.io/velbus-tcp)
 
 Snap package for python-velbustcp
 
