@@ -146,8 +146,8 @@ Ensure the plug is [connected](#Connecting-the-plugs), otherwise USB/serial comm
 
 Try to disect the [logging](#Logging) for possible errors.
 
-Try installing the core snap with:
+Try installing the core22 snap with:
 
 ```yaml
-snap install core
+snap install core22
 ```

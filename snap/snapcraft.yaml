@@ -1,6 +1,6 @@
 name: velbus-tcp
-version: 1.6.1
-base: core18
+version: 2.0.0
+base: core22
 summary: Python application that bridges a Velbus installation with TCP
 description: |
   Python application that bridges a Velbus installation with TCP.
