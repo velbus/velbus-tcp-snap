@@ -10,22 +10,18 @@ confinement: strict
 
 apps:
   velbus-tcp:
-    command: python3 $SNAP/__main__.py --settings $SNAP_DATA/settings.json
+    command: bin/python3 $SNAP/__main__.py --settings $SNAP_DATA/settings.json
     daemon: simple
     plugs: [network-bind, serial-port, raw-usb]
 
 parts:
-  src:
-    plugin: dump
-    source: https://github.com/velbus/python-velbustcp.git
-    source-branch: releases/1.6.1
-    stage-packages: [openssl]
-
   extra: 
     plugin: dump
     source: extra
 
-  python:
+  src:
     plugin: python
-    python-version: python3
+    source: https://github.com/velbus/python-velbustcp.git
+    source-branch: releases/1.6.1
     python-packages: [pyserial, pytz, tzlocal]
+    stage-packages: [openssl]
