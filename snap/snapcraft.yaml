@@ -10,7 +10,7 @@ confinement: strict
 
 apps:
   velbus-tcp:
-    command: bin/python3 $SNAP/__main__.py --settings $SNAP_DATA/settings.json
+    command: bin/python3 -m velbustcp --settings $SNAP_DATA/settings.json
     daemon: simple
     plugs: [network-bind, serial-port, raw-usb]
 
