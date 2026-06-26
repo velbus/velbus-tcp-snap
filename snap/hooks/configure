@@ -212,4 +212,8 @@ hosts_str = ",".join(hosts)
 subprocess.check_output(["snapctl", "set", "tcp.host={0}".format(hosts_str)])
 
 # Reload service
-subprocess.check_output(["snapctl", "restart", "velbus-tcp"])
+# SNAP_INSTANCE_NAME is velbus-tcp for the default instance, or
+# velbus-tcp_<key> for parallel installs; qualify the app name from
+# snapcraft.yaml so restart works for every instance.
+snap_instance = os.environ.get("SNAP_INSTANCE_NAME", "velbus-tcp")
+subprocess.check_output(["snapctl", "restart", snap_instance + ".velbus-tcp"])
