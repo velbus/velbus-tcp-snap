@@ -1,5 +1,5 @@
 name: velbus-tcp
-version: 2.1.1
+version: 2.1.2
 base: core22
 summary: Python application that bridges a Velbus installation with TCP
 description: |
