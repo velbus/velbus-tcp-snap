@@ -81,7 +81,7 @@ You can enable TLS/SSL to encrypt the connection between you and the application
 snap set velbus-tcp tcp.ssl=true
 ```
 
-The used certificate can be found at `/var/snap/velbus-tcp/common/`.
+The used certificate can be found at `/var/snap/velbus-tcp/current/`.
 
 #### Multiple bind points
 

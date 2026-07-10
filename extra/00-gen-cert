@@ -3,16 +3,15 @@
 # Migrate certificates created by older versions of the snap.
 # Previous releases stored certificates in $SNAP_COMMON, which is shared
 # across all parallel instances. They are now stored in $SNAP_DATA so each
-# instance has its own certificate. Copy any existing certificate to the
-# new location to avoid regenerating it during upgrades.
-if [ ! -f "$SNAP_DATA/certificate.pem" ] && [ -f "$SNAP_COMMON/certificate.pem" ]; then
+# instance has its own certificate. During an upgrade (settings.json exists),
+# copy any existing certificate to the new location. On a fresh install,
+# settings.json does not exist yet, so this is skipped and a new certificate
+# is generated for this instance.
+if [ -f "$SNAP_DATA/settings.json" ] && [ ! -f "$SNAP_DATA/certificate.pem" ] && [ -f "$SNAP_COMMON/certificate.pem" ] && [ -f "$SNAP_COMMON/privkey.pem" ]; then
     cp "$SNAP_COMMON/certificate.pem" "$SNAP_DATA/certificate.pem"
     cp "$SNAP_COMMON/privkey.pem" "$SNAP_DATA/privkey.pem"
-    snapctl set tcp.ssl=true
     snapctl set tcp.cert="$SNAP_DATA/certificate.pem"
     snapctl set tcp.pk="$SNAP_DATA/privkey.pem"
-    snapctl set tcp.auth=false
-    snapctl set tcp.authkey="$(cat /proc/sys/kernel/random/uuid)"
 fi
 
 # Check if we have a certificate
