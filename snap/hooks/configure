@@ -133,8 +133,8 @@ for idx, host in enumerate(tcp_hosts):
 	if ssl == "true" and pk == "":
 
 		# Check if local private key exists
-		if os.path.exists(os.environ["SNAP_COMMON"] + "/privkey.pem"):
-			pk = os.environ["SNAP_COMMON"] + "/privkey.pem"
+		if os.path.exists(os.environ["SNAP_DATA"] + "/privkey.pem"):
+			pk = os.environ["SNAP_DATA"] + "/privkey.pem"
 		else:
 			print("No private key in tcp.pk idx {0} while no local private key exists and tcp.ssl is set to 'true'".format(idx))
 			exit(1)
@@ -146,8 +146,8 @@ for idx, host in enumerate(tcp_hosts):
 	if ssl == "true" and cert == "":
 		
 		# Check if local certificate exists
-		if os.path.exists(os.environ["SNAP_COMMON"] + "/certificate.pem"):
-			cert = os.environ["SNAP_COMMON"] + "/certificate.pem"
+		if os.path.exists(os.environ["SNAP_DATA"] + "/certificate.pem"):
+			cert = os.environ["SNAP_DATA"] + "/certificate.pem"
 		else:
 			print("No certificate in tcp.cert idx {0} while no local certificate exists and tcp.ssl is set to 'true'".format(idx))
 			exit(1)
