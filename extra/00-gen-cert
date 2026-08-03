@@ -7,9 +7,18 @@
 # copy any existing certificate to the new location. On a fresh install,
 # settings.json does not exist yet, so this is skipped and a new certificate
 # is generated for this instance.
-if [ -f "$SNAP_DATA/settings.json" ] && [ ! -f "$SNAP_DATA/certificate.pem" ] && [ -f "$SNAP_DATA/certificate.pem" ] && [ -f "$SNAP_DATA/privkey.pem" ]; then
-    cp "$SNAP_DATA/certificate.pem" "$SNAP_DATA/certificate.pem"
-    cp "$SNAP_DATA/privkey.pem" "$SNAP_DATA/privkey.pem"
+
+
+# Current (broken — impossible condition, copies to itself)
+#if [ -f "$SNAP_DATA/settings.json" ] && [ ! -f "$SNAP_DATA/certificate.pem" ] && [ -f "$SNAP_DATA/certificate.pem" ] && [ -f "$SNAP_DATA/privkey.pem" ]; then
+#    cp "$SNAP_DATA/certificate.pem" "$SNAP_DATA/certificate.pem"
+#    cp "$SNAP_DATA/privkey.pem" "$SNAP_DATA/privkey.pem"
+
+# Fixed — source is $SNAP_COMMON, destination is $SNAP_DATA
+if [ -f "$SNAP_DATA/settings.json" ] && [ ! -f "$SNAP_DATA/certificate.pem" ] && [ -f "$SNAP_COMMON/certificate.pem" ] && [ -f "$SNAP_COMMON/privkey.pem" ]; then
+    cp "$SNAP_COMMON/certificate.pem" "$SNAP_DATA/certificate.pem"
+    cp "$SNAP_COMMON/privkey.pem" "$SNAP_DATA/privkey.pem"
+
     snapctl set tcp.cert="$SNAP_DATA/certificate.pem"
     snapctl set tcp.pk="$SNAP_DATA/privkey.pem"
 fi
