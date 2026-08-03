@@ -4,9 +4,9 @@
 # Previous releases stored certificates in $SNAP_COMMON, which is shared
 # across all parallel instances. They are now stored in $SNAP_DATA so each
 # instance has its own certificate. During an upgrade (settings.json exists),
-# copy any existing certificate to the new location. On a fresh install,
-# settings.json does not exist yet, so this is skipped and a new certificate
-# is generated for this instance.
+# copy any existing certificate from $SNAP_COMMON to the new $SNAP_DATA
+# location. On a fresh install, settings.json does not exist yet, so this
+# is skipped and a new certificate is generated for this instance.
 if [ -f "$SNAP_DATA/settings.json" ] && [ ! -f "$SNAP_DATA/certificate.pem" ] && [ -f "$SNAP_COMMON/certificate.pem" ] && [ -f "$SNAP_COMMON/privkey.pem" ]; then
     cp "$SNAP_COMMON/certificate.pem" "$SNAP_DATA/certificate.pem"
     cp "$SNAP_COMMON/privkey.pem" "$SNAP_DATA/privkey.pem"
